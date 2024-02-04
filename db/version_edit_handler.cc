@@ -11,6 +11,7 @@
 
 #include <cinttypes>
 #include <sstream>
+#include <iostream>
 
 #include "db/blob/blob_file_reader.h"
 #include "db/blob/blob_source.h"
@@ -37,7 +38,8 @@ void VersionEditHandlerBase::Iterate(log::Reader& reader,
     if (!s.ok()) {
       break;
     }
-
+    std::cout << "VersionEdit: " << edit.DebugString() << std::endl;
+    
     s = read_buffer_.AddEdit(&edit);
     if (!s.ok()) {
       break;

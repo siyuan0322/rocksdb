@@ -487,7 +487,7 @@ void DBImpl::PurgeObsoleteFiles(JobContext& state, bool schedule_only) {
                                 dbname_);
 
   // File numbers of most recent two OPTIONS file in candidate_files (found in
-  // previos FindObsoleteFiles(full_scan=true))
+  // previous FindObsoleteFiles(full_scan=true))
   // At this point, there must not be any duplicate file numbers in
   // candidate_files.
   uint64_t optsfile_num1 = std::numeric_limits<uint64_t>::min();

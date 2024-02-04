@@ -111,6 +111,11 @@ Status DBImplSecondary::FindNewLogNumbers(std::vector<uint64_t>* logs) {
   } else if (!s.ok()) {
     return s;
   }
+  std::string files;
+  for (auto f : filenames) {
+    files += f + "; ";
+  }
+  ROCKS_LOG_INFO(immutable_db_options_.info_log, "Found Files %s\n", files.c_str());
 
   // if log_readers_ is non-empty, it means we have applied all logs with log
   // numbers smaller than the smallest log in log_readers_, so there is no
@@ -131,6 +136,12 @@ Status DBImplSecondary::FindNewLogNumbers(std::vector<uint64_t>* logs) {
   if (!logs->empty()) {
     std::sort(logs->begin(), logs->end());
   }
+  std::string logs_str;
+  for (auto log : *logs) {
+    logs_str += std::to_string(log) + "; ";
+  }
+  ROCKS_LOG_INFO(immutable_db_options_.info_log, "Found Logs %s\n", logs_str.c_str());
+
   return s;
 }
 

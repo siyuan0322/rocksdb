@@ -56,7 +56,7 @@ size_t TailPrefetchStats::GetSuggestedPrefetchSize() {
     sorted.assign(records_, records_ + num_records_);
   }
 
-  // Of the historic size, we find the maximum one that satisifis the condtiion
+  // Of the historic size, we find the maximum one that satisfies the condition
   // that if prefetching all, less than 1/8 will be wasted.
   std::sort(sorted.begin(), sorted.end());
 

@@ -7441,6 +7441,9 @@ Status ReactiveVersionSet::MaybeSwitchManifest(
   if (!s.ok()) {
     return s;
   }
+  
+  ROCKS_LOG_INFO(db_options_->info_log, "reading manifest path: %s\n", manifest_path.c_str());
+  
   std::unique_ptr<FSSequentialFile> manifest_file;
   if (manifest_reader->get() != nullptr &&
       manifest_reader->get()->file()->file_name() == manifest_path) {

@@ -254,7 +254,7 @@ struct MutableCFOptions {
   size_t inplace_update_num_locks;
   std::shared_ptr<const SliceTransform> prefix_extractor;
   // [experimental]
-  // Used to activate or deactive the Mempurge feature (memtable garbage
+  // Used to activate or deactivate the Mempurge feature (memtable garbage
   // collection). (deactivated by default). At every flush, the total useful
   // payload (total entries minus garbage entries) is estimated as a ratio
   // [useful payload bytes]/[size of a memtable (in bytes)]. This ratio is then
