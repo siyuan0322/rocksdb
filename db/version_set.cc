@@ -7453,6 +7453,7 @@ Status ReactiveVersionSet::MaybeSwitchManifest(
   }
   assert(nullptr == manifest_reader->get() ||
          manifest_reader->get()->file()->file_name() != manifest_path);
+  /*
   s = fs_->FileExists(manifest_path, IOOptions(), nullptr);
   if (s.IsNotFound()) {
     return Status::TryAgain(
@@ -7461,6 +7462,25 @@ Status ReactiveVersionSet::MaybeSwitchManifest(
   } else if (!s.ok()) {
     return s;
   }
+  */
+  // hang until correct MANIFEST path is found
+retry:
+  while (1) {
+    s = fs_->FileExists(manifest_path, IOOptions(), nullptr);
+    if (s.IsNotFound()) {
+      fprintf(stderr, "Miss current manifest, reload\n");
+      s = GetCurrentManifestPath(dbname_, fs_.get(), &manifest_path,
+                                 &manifest_file_number_);
+      if (!s.ok()) {
+        return s;
+      }
+    } else if (!s.ok()) {
+      return s;
+    } else {
+      break;
+    }
+  };
+
   TEST_SYNC_POINT(
       "ReactiveVersionSet::MaybeSwitchManifest:"
       "AfterGetCurrentManifestPath:0");
@@ -7490,9 +7510,10 @@ Status ReactiveVersionSet::MaybeSwitchManifest(
     // This can happen if the primary switches to a new MANIFEST after the
     // secondary reads the CURRENT file but before the secondary actually tries
     // to open the MANIFEST.
-    s = Status::TryAgain(
-        "The primary may have switched to a new MANIFEST and deleted the old "
-        "one.");
+    // s = Status::TryAgain(
+    //     "The primary may have switched to a new MANIFEST and deleted the old "
+    //     "one.");
+    goto retry;
   }
   return s;
 }

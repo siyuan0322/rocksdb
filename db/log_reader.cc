@@ -337,6 +337,19 @@ void Reader::UnmarkEOF() {
   UnmarkEOFInternal();
 }
 
+void Reader::UnmarkEOFWithReopen(FileSystem* fs, const FileOptions& file_opts,
+                                 size_t readahead_size) {
+  if (read_error_) {
+    return;
+  }
+  file_->ReopenUnderlayFile(fs, file_opts, readahead_size);
+  eof_ = false;
+  if (eof_offset_ == 0) {
+    return;
+  }
+  UnmarkEOFInternal();
+}
+
 void Reader::UnmarkEOFInternal() {
   // If the EOF was in the middle of a block (a partial block was read) we have
   // to read the rest of the block as ReadPhysicalRecord can only read full
@@ -358,7 +371,7 @@ void Reader::UnmarkEOFInternal() {
   }
 
   Slice read_buffer;
-  // TODO: rate limit log reader with approriate priority.
+  // TODO: rate limit log reader with appropriate priority.
   // TODO: avoid overcharging rate limiter:
   // Note that the Read here might overcharge SequentialFileReader's internal
   // rate limiter if priority is not IO_TOTAL, e.g., when there is not enough

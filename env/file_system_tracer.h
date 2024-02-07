@@ -173,29 +173,39 @@ class FSSequentialFilePtr {
                       const std::shared_ptr<IOTracer>& io_tracer,
                       const std::string& file_name)
       : io_tracer_(io_tracer),
-        fs_tracer_(std::move(fs), io_tracer_,
+        fs_tracer_(std::make_unique<FSSequentialFileTracingWrapper>(std::move(fs), io_tracer_,
                    file_name.substr(file_name.find_last_of("/\\") +
-                                    1) /* pass file name */) {}
+                                    1) /* pass file name */)) {}
 
   FSSequentialFile* operator->() const {
     if (io_tracer_ && io_tracer_->is_tracing_enabled()) {
-      return const_cast<FSSequentialFileTracingWrapper*>(&fs_tracer_);
+      return const_cast<FSSequentialFileTracingWrapper*>(fs_tracer_.get());
     } else {
-      return fs_tracer_.target();
+      return fs_tracer_->target();
     }
   }
 
   FSSequentialFile* get() const {
     if (io_tracer_ && io_tracer_->is_tracing_enabled()) {
-      return const_cast<FSSequentialFileTracingWrapper*>(&fs_tracer_);
+      return const_cast<FSSequentialFileTracingWrapper*>(fs_tracer_.get());
     } else {
-      return fs_tracer_.target();
+      return fs_tracer_->target();
     }
+  }
+
+  void reset(std::unique_ptr<FSSequentialFile>&& fs,
+             const std::shared_ptr<IOTracer>& io_tracer,
+             const std::string& file_name) {
+    io_tracer_ = io_tracer;
+    fs_tracer_ = std::make_unique<FSSequentialFileTracingWrapper>(
+        std::move(fs), io_tracer_,
+        file_name.substr(file_name.find_last_of("/\\") +
+                         1) /* pass file name */);
   }
 
  private:
   std::shared_ptr<IOTracer> io_tracer_;
-  FSSequentialFileTracingWrapper fs_tracer_;
+  std::unique_ptr<FSSequentialFileTracingWrapper> fs_tracer_;
 };
 
 // FSRandomAccessFileTracingWrapper is a wrapper class above FSRandomAccessFile

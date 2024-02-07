@@ -187,6 +187,14 @@ Status DBImplSecondary::MaybeInitLogReader(
         std::move(file_reader), log_number, skip);
     log_readers_.insert(std::make_pair(
         log_number, std::unique_ptr<LogReaderContainer>(log_reader_container)));
+  } else {
+    // reopen underlying file if reach eof
+    auto reader = iter->second->reader_;
+    if (immutable_db_options_.reopen_log_file_in_eof && reader->IsEOF()) {
+      reader->UnmarkEOFWithReopen(fs_.get(),
+                                  fs_->OptimizeForLogRead(file_options_),
+                                  immutable_db_options_.log_readahead_size);
+    }
   }
   iter = log_readers_.find(log_number);
   assert(iter != log_readers_.end());
@@ -689,6 +697,12 @@ Status DBImplSecondary::TryCatchUpWithPrimary() {
   JobContext job_context(0, true /*create_superversion*/);
   {
     InstrumentedMutexLock lock_guard(&mutex_);
+
+    // if MANIFEST has reached EOF, it needs to be reopened in case primary instance adds new data to MANIFEST. 
+    if(immutable_db_options_.reopen_manifest_in_eof && manifest_reader_.get()->IsEOF()) {
+      manifest_reader_.get()->UnmarkEOFWithReopen(fs_.get(), file_options_, immutable_db_options_.log_readahead_size);
+    }
+
     s = static_cast_with_check<ReactiveVersionSet>(versions_.get())
             ->ReadAndApply(&mutex_, &manifest_reader_,
                            manifest_reader_status_.get(), &cfds_changed);

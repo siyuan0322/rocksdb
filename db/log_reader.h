@@ -107,6 +107,9 @@ class Reader {
   // block that was partially read.
   virtual void UnmarkEOF();
 
+  virtual void UnmarkEOFWithReopen(FileSystem* fs, const FileOptions& file_opts,
+                                   size_t readahead_size);
+
   SequentialFileReader* file() { return file_.get(); }
 
   Reporter* GetReporter() const { return reporter_; }

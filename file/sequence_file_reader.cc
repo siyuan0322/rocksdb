@@ -148,6 +148,23 @@ IOStatus SequentialFileReader::Skip(uint64_t n) {
   return file_->Skip(n);
 }
 
+IOStatus SequentialFileReader::ReopenUnderlayFile(FileSystem* fs,
+                                                  const FileOptions& file_opts,
+                                                  size_t readahead_size) {
+  std::unique_ptr<FSSequentialFile> reopen_file;
+  IOStatus io_s =
+      fs->NewSequentialFile(file_name_, file_opts, &reopen_file, nullptr);
+  if (io_s.ok()) {
+    auto readahead_file =
+        NewReadaheadSequentialFile(std::move(reopen_file), readahead_size);
+    io_s = readahead_file->Skip(offset_.load());
+    if (io_s.ok()) {
+      file_.reset(std::move(readahead_file), nullptr, file_name_);
+    }
+  }
+  return io_s;
+}
+
 namespace {
 // This class wraps a SequentialFile, exposing same API, with the differenece
 // of being able to prefetch up to readahead_size bytes and then serve them

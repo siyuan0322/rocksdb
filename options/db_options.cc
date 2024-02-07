@@ -764,7 +764,9 @@ ImmutableDBOptions::ImmutableDBOptions(const DBOptions& options)
       checksum_handoff_file_types(options.checksum_handoff_file_types),
       lowest_used_cache_tier(options.lowest_used_cache_tier),
       compaction_service(options.compaction_service),
-      enforce_single_del_contracts(options.enforce_single_del_contracts) {
+      enforce_single_del_contracts(options.enforce_single_del_contracts),
+      reopen_log_file_in_eof(options.reopen_log_file_in_eof),
+      reopen_manifest_in_eof(options.reopen_manifest_in_eof) {
   fs = env->GetFileSystem();
   clock = env->GetSystemClock().get();
   logger = info_log.get();
@@ -941,6 +943,10 @@ void ImmutableDBOptions::Dump(Logger* log) const {
                    db_host_id.c_str());
   ROCKS_LOG_HEADER(log, "            Options.enforce_single_del_contracts: %s",
                    enforce_single_del_contracts ? "true" : "false");
+  ROCKS_LOG_HEADER(log, "            Options.reopen_log_file_in_eof: %d",
+                   reopen_log_file_in_eof);
+  ROCKS_LOG_HEADER(log, "            Options.reopen_manifest_in_eof: %d",
+                   reopen_manifest_in_eof);
 }
 
 bool ImmutableDBOptions::IsWalDirSameAsDBPath() const {

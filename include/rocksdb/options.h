@@ -1459,6 +1459,14 @@ struct DBOptions {
   // use "0:00-23:59". To make an entire day have no offpeak period, leave
   // this field blank. Default: Empty string (no offpeak).
   std::string daily_offpeak_time_utc = "";
+
+  // Enable this if db is a secondary instance, and its WAL logs stored in a
+  // remote filesystem whose filehandle/stream never update file length.
+  bool reopen_log_file_in_eof = false;
+
+  // Enable this if db is a secondary instance, and its MANIFEST stored in a
+  // remote filesystem whose filehandle/stream never update file length.
+  bool reopen_manifest_in_eof = true;
 };
 
 // Options to control the behavior of a database (passed to DB::Open)

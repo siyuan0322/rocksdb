@@ -113,6 +113,10 @@ class SequentialFileReader {
 
   bool use_direct_io() const { return file_->use_direct_io(); }
 
+  IOStatus ReopenUnderlayFile(FileSystem* fs,
+                            const FileOptions& file_opts,
+                            size_t readahead_size);
+
  private:
   // NewReadaheadSequentialFile provides a wrapper over SequentialFile to
   // always prefetch additional data with every read.
