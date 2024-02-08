@@ -1466,7 +1466,7 @@ struct DBOptions {
 
   // Enable this if db is a secondary instance, and its MANIFEST stored in a
   // remote filesystem whose filehandle/stream never update file length.
-  bool reopen_manifest_in_eof = true;
+  bool reopen_manifest_in_eof = false;
 };
 
 // Options to control the behavior of a database (passed to DB::Open)

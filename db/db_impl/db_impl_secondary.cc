@@ -711,12 +711,12 @@ Status DBImplSecondary::TryCatchUpWithPrimary() {
                    static_cast<uint64_t>(versions_->LastSequence()));
     for (ColumnFamilyData* cfd : cfds_changed) {
       if (cfd->IsDropped()) {
-        ROCKS_LOG_DEBUG(immutable_db_options_.info_log, "[%s] is dropped\n",
+        ROCKS_LOG_INFO(immutable_db_options_.info_log, "[%s] is dropped\n",
                         cfd->GetName().c_str());
         continue;
       }
       VersionStorageInfo::LevelSummaryStorage tmp;
-      ROCKS_LOG_DEBUG(immutable_db_options_.info_log,
+      ROCKS_LOG_INFO(immutable_db_options_.info_log,
                       "[%s] Level summary: %s\n", cfd->GetName().c_str(),
                       cfd->current()->storage_info()->LevelSummary(&tmp));
     }

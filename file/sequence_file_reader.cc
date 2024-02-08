@@ -166,7 +166,7 @@ IOStatus SequentialFileReader::ReopenUnderlayFile(FileSystem* fs,
 }
 
 namespace {
-// This class wraps a SequentialFile, exposing same API, with the differenece
+// This class wraps a SequentialFile, exposing same API, with the difference
 // of being able to prefetch up to readahead_size bytes and then serve them
 // from memory, avoiding the entire round-trip if, for example, the data for the
 // file is actually remote.
